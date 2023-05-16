@@ -14,51 +14,25 @@ defaultDateRange[0] = str(int(defaultDateRange[0]) - 7)
 if (int(defaultDateRange[0]) < 10):
     defaultDateRange[0] = "0" + defaultDateRange[0]
 
-f = open("news.json")
-data = list(json.load(f))
-
-# try:
-
-#     f = requests.get("http://127.0.0.1:5000/news").json()
-# except:
-#     print("Could not reach the server")
-#     exit()
-
-# data = list(f)
+# f = open("news.json")
+# data = list(json.load(f))
 
 info = open("settings.json")
 infoData = dict(json.load(info))
 
-specificData = []
-
 subject = infoData["subject"]
 region = infoData["region"]
-newsOutlet = infoData["newsOutlet"]
+source = infoData["newsOutlet"]
 minimumDate = infoData["minimumDate"]
 maximumDate = infoData["maximumDate"]
 
-if infoData["minimumDate"] == "" or infoData["maximumDate"] == "":
-    minimumDate = "/".join(defaultDateRange)
-    maximumDate = currentDate
-else:
-    minimumDate = infoData["minimumDate"]
-    maximumDate = infoData["maximumDate"]
+try:
+    f = requests.get(f"http://127.0.0.1:5000/news?subject={subject}&region={region}&source={source}&minimumDate={minimumDate}&maximumDate={maximumDate}").json()
+except:
+    print("Could not reach the server")
+    exit()
 
-for article in data:
-    if (article["subject"].lower() == subject.lower()) or subject == "":
-        specificData.append(article)
-
-finalData = []
-
-for article in specificData:
-    publishDate = article["publishDate"].split("/")
-
-    min = minimumDate.split("/")
-    max = maximumDate.split("/")
-
-    if int(publishDate[0]) in range(int(min[0]), int(max[0])):
-        if ((article["region"] == region or region == "") and (article["source"] == newsOutlet or newsOutlet == "")):
-            finalData.append(article)
+finalData = f
 
 def sentimentAnalysis(): 
     outcomes = []
@@ -165,9 +139,27 @@ def sentimentAnalysis():
 
     #plotting graph
 
-    y = np.array([positivePercent, negativePercent, neutralPercent])
+    arr = []
+    labels = []
+    colors = []
 
-    plt.pie(y, labels=["Positive Articles", "Negative Articles", "Neutral Articles"], autopct="%1.1f%%", colors=["#4CAF50", "#DA2222", "hotpink"])
+    for i,v in enumerate([positivePercent, negativePercent, neutralPercent]):
+        if v != 0:
+            if i == 0:
+                labels.append("Positive Articles")
+                colors.append("#4CAF50")
+            elif i == 1:
+                labels.append("Negative Articles")
+                colors.append("#DA2222")
+            elif i == 2:
+                labels.append("Neutral articles")
+                colors.append("hotpink")
+            arr.append(v)
+
+    print(arr)
+    y = np.array(arr)
+
+    plt.pie(y, labels=labels, autopct="%1.1f%%", colors=colors)
     plt.title("Article Sentiment Analysis", fontsize=20)
     plt.show()
 
