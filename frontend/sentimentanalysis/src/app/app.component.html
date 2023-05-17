@@ -1,0 +1,24 @@
+<h1>Articles</h1>
+
+<hr>
+
+<p>Article Subject </p><input [(ngModel)]="formData.subject" type="text">
+<p>Region </p><input type="text" [(ngModel)]="formData.region">
+<p>News Outlet </p><input type="text" [(ngModel)]="formData.source">
+<p>Minimum Date, please input in the format DD/MM/YY </p><input type="text" [(ngModel)]="formData.min">
+<p>Maximum Date, please input in the format DD/MM/YY </p><input type="text" [(ngModel)]="formData.max">
+<br>
+<br>
+<p><i>Note, the default date is the last 7 days.</i></p>
+
+<input type="submit" (click)="onSubmit()">
+
+<hr>
+
+<div *ngFor="let article of data">
+  <h1>{{article.title}}</h1>
+  <h2><i>{{article.subject}}</i></h2>
+  <h3>{{article.content}}</h3>
+  <p><i>Published on {{article.publishDate}}, Written by {{article.author}}. Source - {{article.source}}</i></p>
+  <hr>
+</div>

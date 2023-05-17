@@ -1,0 +1,11 @@
+h1,p,h2,h3 {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+    color:cadetblue;
+}
+
+h2 {
+    color: gray;
+}

@@ -27,12 +27,23 @@ minimumDate = infoData["minimumDate"]
 maximumDate = infoData["maximumDate"]
 
 try:
-    f = requests.get(f"http://127.0.0.1:5000/news?subject={subject}&region={region}&source={source}&minimumDate={minimumDate}&maximumDate={maximumDate}").json()
+    f = requests.get(f"http://127.0.0.1:5000/news?subject={subject}&region={region}&source={source}&minimumDate={minimumDate}&maximumDate={maximumDate}")
 except:
     print("Could not reach the server")
     exit()
 
+try:
+    f = f.json()
+except:
+    print("Data recieved from server was invalid")
+    print("Error - " + f.text)
+    exit()
+
 finalData = f
+
+if len(finalData) == 0:
+    print("No results")
+    exit()
 
 def sentimentAnalysis(): 
     outcomes = []
@@ -52,7 +63,6 @@ def sentimentAnalysis():
                     positiveWords.append(contents[i].strip())
                 
                 if word in positiveWords:
-                    #print(word + " is positive")
                     positivePoints += 1
 
             with open("negative.txt") as file:
@@ -63,7 +73,6 @@ def sentimentAnalysis():
                     negativeWords.append(contents[i].strip())
 
                 if word in negativeWords:
-                    #print(word + " is negative")
                     negativePoints += 1
 
         if positivePoints > negativePoints:
@@ -100,7 +109,7 @@ def sentimentAnalysis():
     
     print("\nPositive Articles\n")
 
-    if len(positiveArticles) > 1:
+    if len(positiveArticles) >= 1:
         for i in range(len(positiveArticles)):
             if i >= 2:
                 break
@@ -113,7 +122,7 @@ def sentimentAnalysis():
 
     print("\nNegative Articles\n")
 
-    if len(negativeArticles) > 1:
+    if len(negativeArticles) >= 1:
         for i in range(len(negativeArticles)):
             if i >= 2:
                 break
@@ -121,12 +130,12 @@ def sentimentAnalysis():
             print(negativeArticles[i]["title"])
             print(negativeArticles[i]["publishDate"])
             print(negativeArticles[i]["source"])
-
-        print("\nNeutral Articles\n")
     else:
         print("n/a")
 
-    if len(neutralArticles) > 1:
+    print("\nNeutral Articles\n")
+
+    if len(neutralArticles) >= 1:
         for i in range(len(neutralArticles)):
             if i >= 2:
                 break
@@ -137,7 +146,7 @@ def sentimentAnalysis():
     else:
         print("n/a")
 
-    #plotting graph
+    #pie chart
 
     arr = []
     labels = []
@@ -156,7 +165,6 @@ def sentimentAnalysis():
                 colors.append("hotpink")
             arr.append(v)
 
-    print(arr)
     y = np.array(arr)
 
     plt.pie(y, labels=labels, autopct="%1.1f%%", colors=colors)
